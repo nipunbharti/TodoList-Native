@@ -26,47 +26,45 @@ export default class TodoList extends Component {
   };
 
   addTask = () => {
-    let notEmpty = this.state.text.trim().length > 0;
-
-    if (notEmpty) {
-      this.setState(
-        prevState => {
-          let { tasks, text } = prevState;
-          return {
-            tasks: tasks.concat({ key: tasks.length, text: text }),
-            text: ""
-          };
-        },
-        () => Tasks.save(this.state.tasks)
-      );
-    }
+    // let notEmpty = this.state.text.trim().length > 0;
+    // if (notEmpty) {
+    //   this.setState(
+    //   	prevState => {
+  		//     let { tasks, text } = prevState;
+  		//     tasks = [...tasks, text];
+  		//     return{
+  		//     	tasks: tasks,
+  		//     	text: ""
+  		//     }
+    //   	}
+    //   )
+    // }
+    console.log("Add task!");
   };
 
   deleteTask = i => {
-    this.setState(
-      prevState => {
-        let tasks = prevState.tasks.slice();
-
-        tasks.splice(i, 1);
-
-        return { tasks: tasks };
-      },
-      () => Tasks.save(this.state.tasks)
-    );
+    // this.setState(
+    //   prevState => {
+    //   	let tasks = [...prevState.tasks];
+    //   	tasks = [...tasks.slice(0,i),...tasks.slice(i+1)];
+    //   	return{
+    //   		tasks: tasks,
+    //   	}
+    //   }
+    // );
+    console.log("Delete task");
   };
 
   componentDidMount() {
-    Keyboard.addListener(
-      isAndroid ? "keyboardDidShow" : "keyboardWillShow",
-      e => this.setState({ viewPadding: e.endCoordinates.height + viewPadding })
-    );
+    // Keyboard.addListener(
+    //   isAndroid ? "keyboardDidShow" : "keyboardWillShow",
+    //   e => this.setState({ viewPadding: e.endCoordinates.height + viewPadding })
+    // );
 
-    Keyboard.addListener(
-      isAndroid ? "keyboardDidHide" : "keyboardWillHide",
-      () => this.setState({ viewPadding: viewPadding })
-    );
-
-    Tasks.all(tasks => this.setState({ tasks: tasks || [] }));
+    // Keyboard.addListener(
+    //   isAndroid ? "keyboardDidHide" : "keyboardWillHide",
+    //   () => this.setState({ viewPadding: viewPadding })
+    // );
   }
 
   render() {
@@ -77,16 +75,19 @@ export default class TodoList extends Component {
         <FlatList
           style={styles.list}
           data={this.state.tasks}
-          renderItem={({ item, index }) =>
-            <View>
-              <View style={styles.listItemCont}>
-                <Text style={styles.listItem}>
-                  {item.text}
-                </Text>
-                <Button title="X" onPress={() => this.deleteTask(index)} />
-              </View>
-              <View style={styles.hr} />
-            </View>}
+          renderItem={
+          	({ item, index }) =>
+      		    <View>
+	              <View style={styles.listItemCont}>
+	                <Text style={styles.listItem}>
+	                  {item}
+	                </Text>
+	                {/* <Button title="X" onPress={() => this.deleteTask(index)} /> */} 
+	                <Button title="X" />
+	              </View>
+	              <View style={styles.hr} />
+	            </View>
+        	}
         />
         <TextInput
           style={styles.textInput}
@@ -94,32 +95,11 @@ export default class TodoList extends Component {
           onSubmitEditing={this.addTask}
           value={this.state.text}
           placeholder="Add Tasks"
-          returnKeyType="done"
-          returnKeyLabel="done"
         />
       </View>
     );
   }
 }
-
-let Tasks = {
-  convertToArrayOfObject(tasks, callback) {
-    return callback(
-      tasks ? tasks.split("||").map((task, i) => ({ key: i, text: task })) : []
-    );
-  },
-  convertToStringWithSeparators(tasks) {
-    return tasks.map(task => task.text).join("||");
-  },
-  all(callback) {
-    return AsyncStorage.getItem("TASKS", (err, tasks) =>
-      this.convertToArrayOfObject(tasks, callback)
-    );
-  },
-  save(tasks) {
-    AsyncStorage.setItem("TASKS", this.convertToStringWithSeparators(tasks));
-  }
-};
 
 const styles = StyleSheet.create({
   container: {
